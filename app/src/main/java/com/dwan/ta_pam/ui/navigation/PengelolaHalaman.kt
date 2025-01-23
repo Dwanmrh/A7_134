@@ -22,6 +22,7 @@ fun PengelolaHalaman(navController: NavHostController = rememberNavController())
         startDestination = DestinasiHome.route,
         modifier = Modifier,
     ) {
+        // Halaman Home Pasien
         composable(DestinasiHome.route) {
             HomeScreen(
                 navigateToPasienEntry = {
@@ -33,29 +34,33 @@ fun PengelolaHalaman(navController: NavHostController = rememberNavController())
                 navigateToTerapis = {},
                 navigateToJenisTerapi = {},
                 navigateToSesiTerapi = {},
-                onDetailClick = {},
+                onDetailClick = { id_pasien ->
+                    // Navigasi ke halaman detail (jika diperlukan)
+                },
                 navigateToUpdatePasien = { id_pasien ->
                     // Navigasi ke halaman update dengan menyertakan id_pasien sebagai argumen
                     navController.navigate("${DestinasiUpdatePasien.route}/$id_pasien")
                 }
             )
         }
-
+        // Halaman Entry Pasien
         composable(DestinasiEntryPasien.route) {
             EntryPasScreen(
                 navigateBack = {
-                    navController.navigate(DestinasiHome.route) {
-                        popUpTo(DestinasiHome.route) { inclusive = true }
-                    }
+                    navController.popBackStack() // Kembali ke halaman sebelumnya
                 }
             )
         }
-
+        // Halaman Update Pasien
         composable(
             route = DestinasiUpdatePasien.routeWithArgs,
             arguments = listOf(navArgument(DestinasiUpdatePasien.id_pasien) { type = NavType.StringType })
         ) { backStackEntry ->
+            // Ambil id_pasien dari argumen navigasi
+            val id_pasien = backStackEntry.arguments?.getString(DestinasiUpdatePasien.id_pasien) ?: ""
+
             UpdatePasScreen(
+                id_pasien = id_pasien, // Teruskan id_pasien ke UpdatePasScreen
                 navigateBack = { navController.popBackStack() }
             )
         }
