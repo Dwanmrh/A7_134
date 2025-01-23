@@ -77,4 +77,28 @@ class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
         val riwayat_medikal: String = ""
     )
 
+    // Fungsi untuk mengubah data UpdateUiEvent menjadi Pasien
+    fun UpdateUiEvent.toPas(): Pasien = Pasien( // UpdateUiEvent > Pasien > Simpan data Pas ke db
+        id_pasien = id_pasien, // Memindahkan nilai ID Pasien dari UpdateUiEvent ke Pasien
+        nama_pasien = nama_pasien,
+        alamat = alamat,
+        nomor_telepon = nomor_telepon,
+        tanggal_lahir = tanggal_lahir,
+        riwayat_medikal = riwayat_medikal
+    )
+
+    // Fungsi untuk mengubah data Pasien menjadi UpdateUiState
+    fun Pasien.toUpdateUiStatePas(): UpdateUiState = UpdateUiState( // Pasien > updateUiEvent > Masuk ke UpdateUiState
+        updateUiEvent = toUpdateUiEvent() // Memanggil fungsi toUpdateUiEvent untuk mengonversi data Pasien
+    )
+
+    // Fungsi untuk mengubah data Pasien menjadi data UpdateUiEvent
+    fun Pasien.toUpdateUiEvent(): UpdateUiEvent = UpdateUiEvent(
+        id_pasien = id_pasien, // Memindahkan nilai ID Pasien dari Pasien ke UpdateUiEvent
+        nama_pasien = nama_pasien,
+        alamat = alamat,
+        nomor_telepon = nomor_telepon,
+        tanggal_lahir = tanggal_lahir,
+        riwayat_medikal = riwayat_medikal
+    )
 }
