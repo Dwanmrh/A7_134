@@ -10,7 +10,7 @@ import com.dwan.ta_pam.repository.PasienRepo
 import kotlinx.coroutines.launch
 
 // ViewModel untuk mengatur data dan logika form update mahasiswa
-class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
+class UpdatePasienViewModel(private val pasienRepo: PasienRepo) : ViewModel() {
 
     // Data untuk menyimpan keadaan form (seperti input dari pengguna)
     var updateUiState by mutableStateOf(UpdateUiState())
@@ -20,7 +20,7 @@ class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
     fun getPasienById(id_pasien: String) {
         viewModelScope.launch {
             try {
-                val pasien = pas.getPasienById(id_pasien)
+                val pasien = pasienRepo.getPasienById(id_pasien)
                 updateUiState = updateUiState.copy(
                     updateUiEvent = UpdateUiEvent(
                         id_pasien = pasien.id_pasien,
@@ -52,7 +52,7 @@ class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
         viewModelScope.launch { // Menjalankan proses di latar belakang (tidak mengganggu UI)
             try {
                 // Mengambil data dari form dan mengirimnya ke repository
-                pas.updatePasien(
+                pasienRepo.updatePasien(
                     id_pasien = updateUiState.updateUiEvent.id_pasien, // Ambil NIM dari updateUiState
                     pasien = updateUiState.updateUiEvent.toPas() // Konversi event menjadi Mahasiswa
                 )
