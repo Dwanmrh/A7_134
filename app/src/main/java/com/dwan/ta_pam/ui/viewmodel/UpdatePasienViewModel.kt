@@ -61,4 +61,20 @@ class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
             }
         }
     }
+
+    // Menyimpan state form update pasien
+    data class UpdateUiState(
+        val updateUiEvent: UpdateUiEvent = UpdateUiEvent() // State default berisi objek kosong dari UpdateUiEvent
+    )
+
+    // Menyimpan data input pengguna untuk form update pasien
+    data class UpdateUiEvent(
+        val id_pasien: String = "",
+        val nama_pasien: String = "",
+        val alamat: String = "",
+        val nomor_telepon: String = "",
+        val tanggal_lahir: String = "",
+        val riwayat_medikal: String = ""
+    )
+
 }
