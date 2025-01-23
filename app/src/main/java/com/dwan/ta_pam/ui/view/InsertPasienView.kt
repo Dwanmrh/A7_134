@@ -5,17 +5,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dwan.ta_pam.ui.customwidget.CustomTopAppBar
@@ -97,5 +102,84 @@ fun EntryBodyPas(
         ) {
             Text(text = "Simpan")
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FormInputPas(
+    insertUiEvent: InsertUiEvent,
+    modifier: Modifier = Modifier,
+    onValueChange: (InsertUiEvent) -> Unit = {},
+    enabled: Boolean = true
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        OutlinedTextField(
+            value = insertUiEvent.nama_pasien,
+            onValueChange = { onValueChange(insertUiEvent.copy(nama_pasien = it)) },
+            label = { Text("Nama Pasien") },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )
+        OutlinedTextField(
+            value = insertUiEvent.id_pasien,
+            onValueChange = { onValueChange(insertUiEvent.copy(id_pasien = it)) },
+            label = { Text("ID Pasien") },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )
+        OutlinedTextField(
+            value = insertUiEvent.alamat,
+            onValueChange = { onValueChange(insertUiEvent.copy(alamat = it)) },
+            label = { Text("Alamat") },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )
+        OutlinedTextField(
+            value = insertUiEvent.nomor_telepon,
+            onValueChange = { onValueChange(insertUiEvent.copy(nomor_telepon = it)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            label = { Text("Nomor Telepon") },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )
+        OutlinedTextField(
+            value = insertUiEvent.tanggal_lahir,
+            onValueChange = { onValueChange(insertUiEvent.copy(tanggal_lahir = it)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            label = { Text("Tanggal Lahir") },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )
+        OutlinedTextField(
+            value = insertUiEvent.riwayat_medikal,
+            onValueChange = { onValueChange(insertUiEvent.copy(riwayat_medikal = it)) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            label = { Text("Riwayat Medikal") },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled,
+            singleLine = true
+        )
+        // Menampilkan pesan "Isi Semua Data!" jika input aktif
+        if (enabled) {
+            Text(
+                text = "Harap Mengisi Semua Data!",
+                modifier = Modifier.padding(12.dp),
+                color = Color.Green
+            )
+        }
+        // Garis pemisah tebal
+        Divider(
+            thickness = 8.dp,
+            modifier = Modifier.padding(12.dp)
+        )
     }
 }
