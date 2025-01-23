@@ -34,7 +34,7 @@ import com.dwan.ta_pam.ui.viewmodel.UpdateUiState
 import kotlinx.coroutines.launch
 
 object DestinasiUpdatePasien : DestinasiNavigasi {
-    override val route = "edit_pasien"
+    override val route = "update_pasien"
     override val titleRes = "Update Pasien"
     const val id_pasien = "id_pasien"
     val routeWithArgs = "$route/{$id_pasien}"
