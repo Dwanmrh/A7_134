@@ -11,6 +11,7 @@ import androidx.navigation.navArgument
 import com.dwan.ta_pam.ui.view.DestinasiEntryPasien
 import com.dwan.ta_pam.ui.view.DestinasiHome
 import com.dwan.ta_pam.ui.view.DestinasiUpdatePasien
+import com.dwan.ta_pam.ui.view.DetailPasScreen
 import com.dwan.ta_pam.ui.view.EntryPasScreen
 import com.dwan.ta_pam.ui.view.HomeScreen
 import com.dwan.ta_pam.ui.view.UpdatePasScreen
@@ -35,7 +36,7 @@ fun PengelolaHalaman(navController: NavHostController = rememberNavController())
                 navigateToJenisTerapi = {},
                 navigateToSesiTerapi = {},
                 onDetailClick = { id_pasien ->
-                    // Navigasi ke halaman detail (jika diperlukan)
+                    navController.navigate("detail_pasien/$id_pasien") // Navigasi ke DetailPasScreen dengan parameter id_pasien
                 },
                 navigateToUpdatePasien = { id_pasien ->
                     // Navigasi ke halaman update dengan menyertakan id_pasien sebagai argumen
@@ -62,6 +63,22 @@ fun PengelolaHalaman(navController: NavHostController = rememberNavController())
             UpdatePasScreen(
                 id_pasien = id_pasien, // Teruskan id_pasien ke UpdatePasScreen
                 navigateBack = { navController.popBackStack() }
+            )
+        }
+        // Halaman Detail Pasien
+        composable(
+            route = "detail_pasien/{id_pasien}", // Rute dengan parameter id_pasien
+            arguments = listOf(navArgument("id_pasien") { type = NavType.StringType }) // Parameter id_pasien bertipe String
+        ) { backStackEntry ->
+            val id_pasien = backStackEntry.arguments?.getString("id_pasien") ?: "" // Ambil id_pasien dari argument
+            DetailPasScreen(
+                id_pasien = id_pasien, // Berikan id_pasien ke DetailPasScreen
+                navigateEdit = { id_pasien ->
+                    navController.navigate("update_pasien/$id_pasien") // Navigasi ke halaman UpdatePasScreen dengan id_pasien
+                },
+                navigateBack = {
+                    navController.popBackStack() // Kembali ke layar sebelumnya
+                }
             )
         }
     }
