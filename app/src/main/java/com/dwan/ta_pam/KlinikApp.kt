@@ -15,22 +15,8 @@ import com.dwan.ta_pam.ui.navigation.PengelolaHalaman
 @Composable
 fun KlinikApp(modifier: Modifier = Modifier) {
 
-    // Mengatur perilaku scroll untuk TopAppBar
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    Scaffold(
 
-        // Menambahkan scroll behavior ke Scaffold
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        // topBar = { TopAppBar(scrollBehavior = scrollBehavior) }
-    ) {
-        // Area konten utama
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-        ) {
             // Menampilkan halaman dengan navigasi
             PengelolaHalaman()
         }
-    }
-}
+
