@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -71,6 +72,7 @@ fun HomeScreen(
     navigateToSesiTerapi: () -> Unit, // Navigasi ke halaman Sesi Terapi
     modifier: Modifier = Modifier,
     onDetailClick: (String) -> Unit = {}, // Navigasi ke halaman detail
+    navigateToUpdatePasien: (String) -> Unit,
     viewModel: HomePasienViewModel = viewModel(factory = PenyediaViewModel.Factory) // ViewModel untuk mengelola data
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -119,7 +121,8 @@ fun HomeScreen(
             onDeleteClick = { pasien ->
                 viewModel.deletePas(pasien.id_pasien)
                 viewModel.getPas()
-            }
+            },
+            navigateToUpdatePasien = navigateToUpdatePasien
         )
     }
 }
@@ -128,6 +131,7 @@ fun HomeScreen(
 fun HomeStatus(
     homeUiState: HomeUiState,
     retryAction: () -> Unit,
+    navigateToUpdatePasien: (String) -> Unit,
     modifier: Modifier = Modifier,
     onDeleteClick: (Pasien) -> Unit = {},
     onDetailClick: (String) -> Unit
@@ -138,13 +142,14 @@ fun HomeStatus(
             if (homeUiState.pasien.isEmpty()) {
                 // Tampilkan pesan jika data kosong
                 Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Tidak ada data Pasien")
+                    Text(text = "Tidak ada data Mahasiswa")
                 }
             } else {
-                // Tampilkan daftar pasien
+                // Tampilkan daftar mahasiswa
                 PasLayout(
                     pasien = homeUiState.pasien,
                     modifier = modifier.fillMaxWidth(),
+                    navigateToUpdatePasien = navigateToUpdatePasien,
                     onDetailClick = { onDetailClick(it.id_pasien) }, // Mengarahkan ke detail
                     onDeleteClick = { onDeleteClick(it) }
                 )
@@ -191,6 +196,7 @@ fun OnError(retryAction: () -> Unit, modifier: Modifier = Modifier) {
 fun PasLayout(
     pasien: List<Pasien>,
     modifier: Modifier = Modifier,
+    navigateToUpdatePasien: (String) -> Unit,
     onDetailClick: (Pasien) -> Unit,
     onDeleteClick: (Pasien) -> Unit = {}
 ) {
@@ -205,6 +211,7 @@ fun PasLayout(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onDetailClick(pasien) }, // Fungsi klik untuk detail
+                navigateToUpdatePasien = navigateToUpdatePasien,
                 onDeleteClick = { onDeleteClick(pasien) }
             )
         }
@@ -213,38 +220,27 @@ fun PasLayout(
 
 @Composable
 fun PasCard(
-    pasien: Pasien, // Data pasien
+    pasien: Pasien,
     modifier: Modifier = Modifier,
+    navigateToUpdatePasien: (String) -> Unit,
     onDeleteClick: (Pasien) -> Unit = {}
 ) {
-    // State untuk menampilkan dialog konfirmasi
     var deleteConfirmationRequired by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .shadow(8.dp, shape = MaterialTheme.shapes.medium), // Tambahkan bayangan
+            .shadow(8.dp, shape = MaterialTheme.shapes.medium),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary // Warna latar belakang kartu
+            containerColor = MaterialTheme.colorScheme.primary
         )
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Gambar profil
-            Image(
-                painter = painterResource(id = R.drawable.profile),
-                contentDescription = "Foto Pasien",
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(MaterialTheme.shapes.small) // Bentuk lingkaran
-            )
-
-            Spacer(Modifier.width(16.dp)) // Jarak antar elemen
-
             // Informasi Pasien
             Column(
                 modifier = Modifier.weight(1f),
@@ -253,7 +249,7 @@ fun PasCard(
                 Text(
                     text = pasien.nama_pasien,
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.secondaryContainer // Warna teks
+                    color = MaterialTheme.colorScheme.secondaryContainer
                 )
                 Text(
                     text = pasien.id_pasien,
@@ -267,7 +263,19 @@ fun PasCard(
                 )
             }
 
-            // Tombol hapus dengan animasi
+            // Tombol Edit
+            IconButton(
+                onClick = { navigateToUpdatePasien(pasien.id_pasien) }, // Navigasi ke halaman update
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit Pasien",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
+
+            // Tombol Hapus
             IconButton(
                 onClick = { deleteConfirmationRequired = true },
                 modifier = Modifier.size(32.dp)
@@ -275,13 +283,13 @@ fun PasCard(
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error // Warna ikon
+                    tint = MaterialTheme.colorScheme.error
                 )
             }
         }
     }
 
-    // Dialog konfirmasi hapus
+    // Dialog Konfirmasi Hapus
     if (deleteConfirmationRequired) {
         DeleteConfirmationDialog(
             onDeleteConfirm = {
