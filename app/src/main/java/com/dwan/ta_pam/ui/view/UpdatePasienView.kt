@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 
 object DestinasiUpdatePasien : DestinasiNavigasi {
     override val route = "edit_pasien"
-    override val titleRes = "Edit Pasien"
+    override val titleRes = "Update Pasien"
     const val id_pasien = "id_pasien"
     val routeWithArgs = "$route/{$id_pasien}"
 }
@@ -43,24 +43,17 @@ object DestinasiUpdatePasien : DestinasiNavigasi {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdatePasScreen(
+    id_pasien: String,
     navigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: UpdatePasienViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
-    // Ambil NavController dari komposisi
-    val navController = rememberNavController()
-
-    // Ambil id_pasien dari argumen navigasi
-    val id_pasien = remember {
-        navController.currentBackStackEntry?.arguments?.getString(DestinasiUpdatePasien.id_pasien)
-    } ?: ""
-
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
-    // Load data pasien berdasarkan id_pasien
+    // Tambahkan LaunchedEffect untuk mengambil data saat layar dibuka
     LaunchedEffect(id_pasien) {
-        viewModel.loadPasien(id_pasien)
+        viewModel.getPasienById(id_pasien)
     }
 
     Scaffold(
@@ -139,10 +132,10 @@ fun FormInputPas(
         )
         OutlinedTextField(
             value = updateUiEvent.id_pasien,
-            onValueChange = {}, // ID Pasien tidak bisa diubah
+            onValueChange = { onValueChange(updateUiEvent.copy(id_pasien = it)) },
             label = { Text("ID Pasien") },
             modifier = Modifier.fillMaxWidth(),
-            enabled = false, // Tidak diizinkan mengubah ID Pasien
+            enabled = true, // Tidak diizinkan mengubah ID Pasien
             singleLine = true
         )
         OutlinedTextField(
@@ -175,7 +168,7 @@ fun FormInputPas(
             value = updateUiEvent.riwayat_medikal,
             onValueChange = { onValueChange(updateUiEvent.copy(riwayat_medikal = it)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            label = { Text("Riwayat Medikal") },
+            label = { Text("Riwatat Medikal") },
             modifier = Modifier.fillMaxWidth(),
             enabled = enabled,
             singleLine = true
