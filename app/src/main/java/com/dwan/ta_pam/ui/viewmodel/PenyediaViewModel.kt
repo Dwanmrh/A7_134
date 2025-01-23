@@ -9,6 +9,7 @@ import com.dwan.ta_pam.KlinikApplication
 object PenyediaViewModel {
     val Factory = viewModelFactory{
         initializer { HomePasienViewModel(KlinikApplication().container.pasienRepo) }
+        initializer { InsertPasienViewModel(KlinikApplication().container.pasienRepo) }
     }
     fun CreationExtras.KlinikApplication(): KlinikApplication =
         (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]as KlinikApplication)
