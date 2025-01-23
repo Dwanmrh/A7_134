@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dwan.ta_pam.model.Pasien
 import com.dwan.ta_pam.repository.PasienRepo
 import kotlinx.coroutines.launch
 
@@ -46,4 +47,29 @@ data class InsertUiEvent(
     val nomor_telepon: String = "",
     val tanggal_lahir: String = "",
     val riwayat_medikal: String = ""
+)
+
+// Fungsi untuk mengubah data InsertUiEvent menjadi pasien
+fun InsertUiEvent.toPas(): Pasien = Pasien( // InsertUiEvent > Pasien > Simpan data Pas ke db
+    id_pasien = id_pasien, // Memindahkan nilai ID Pasien dari InsertUiEvent ke Pasien
+    nama_pasien = nama_pasien,
+    alamat = alamat,
+    nomor_telepon = nomor_telepon,
+    tanggal_lahir = tanggal_lahir,
+    riwayat_medikal = riwayat_medikal
+)
+
+// Fungsi untuk mengubah data Pasien menjadi InsertUiState
+fun Pasien.toInsertUiStatePas(): InsertUiState = InsertUiState( // Pasien > insertUiEvent > Masuk ke InsertUiState
+    insertUiEvent = toInsertUiEvent() // Memanggil fungsi toInsertUiEvent untuk mengonversi data Pasien
+)
+
+// Fungsi untuk mengubah data Pasien menjadi data InsertUiEvent
+fun Pasien.toInsertUiEvent(): InsertUiEvent = InsertUiEvent(
+    id_pasien = id_pasien, // Memindahkan nilai ID Pasien dari Pasien ke InsertUiEvent
+    nama_pasien = nama_pasien,
+    alamat = alamat,
+    nomor_telepon = nomor_telepon,
+    tanggal_lahir = tanggal_lahir,
+    riwayat_medikal = riwayat_medikal
 )
