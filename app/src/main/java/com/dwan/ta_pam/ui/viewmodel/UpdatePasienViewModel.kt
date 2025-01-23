@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dwan.ta_pam.model.Pasien
 import com.dwan.ta_pam.repository.PasienRepo
+import com.dwan.ta_pam.ui.view.DestinasiUpdatePasien.id_pasien
 import kotlinx.coroutines.launch
 
 // ViewModel untuk mengatur data dan logika form update pasien
@@ -16,7 +17,7 @@ class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
     var updateUiState by mutableStateOf(UpdateUiState())
         private set
 
-    // Fungsi untuk mendapatkan data pasien berdasarkan ID Pasien
+    // Fungsi untuk mendapatkan data pasien berdasarkan NIM
     fun getPasienById(id_pasien: String) {
         viewModelScope.launch {
             try {
@@ -43,8 +44,25 @@ class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
     }
 
     // Fungsi untuk memuat data pasien ke dalam form untuk di-update
-    fun loadPasienData(pasien: Pasien) {
-        updateUiState = pasien.toUpdateUiStatePas()
+    fun loadPasien(id_pasien: String) {
+        viewModelScope.launch {
+            try {
+                val pasien = pas.getPasienById(id_pasien) // Ambil data pasien dari repository
+                updateUiState = updateUiState.copy(
+                    updateUiEvent = UpdateUiEvent(
+                        id_pasien = pasien.id_pasien,
+                        nama_pasien = pasien.nama_pasien,
+                        alamat = pasien.alamat,
+                        nomor_telepon = pasien.nomor_telepon,
+                        tanggal_lahir = pasien.tanggal_lahir,
+                        riwayat_medikal = pasien.riwayat_medikal
+                    )
+                )
+            } catch (e: Exception) {
+                // Handle error jika diperlukan
+                e.printStackTrace()
+            }
+        }
     }
 
     // Fungsi untuk memperbarui data pasien ke database
@@ -53,7 +71,7 @@ class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
             try {
                 // Mengambil data dari form dan mengirimnya ke repository
                 pas.updatePasien(
-                    id_pasien = updateUiState.updateUiEvent.id_pasien, // Ambil ID Pasien dari updateUiState
+                    id_pasien = updateUiState.updateUiEvent.id_pasien, // Ambil NIM dari updateUiState
                     pasien = updateUiState.updateUiEvent.toPas() // Konversi event menjadi Pasien
                 )
             } catch (e: Exception) {
@@ -61,44 +79,44 @@ class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
             }
         }
     }
-
-    // Menyimpan state form update pasien
-    data class UpdateUiState(
-        val updateUiEvent: UpdateUiEvent = UpdateUiEvent() // State default berisi objek kosong dari UpdateUiEvent
-    )
-
-    // Menyimpan data input pengguna untuk form update pasien
-    data class UpdateUiEvent(
-        val id_pasien: String = "",
-        val nama_pasien: String = "",
-        val alamat: String = "",
-        val nomor_telepon: String = "",
-        val tanggal_lahir: String = "",
-        val riwayat_medikal: String = ""
-    )
-
-    // Fungsi untuk mengubah data UpdateUiEvent menjadi Pasien
-    fun UpdateUiEvent.toPas(): Pasien = Pasien( // UpdateUiEvent > Pasien > Simpan data Pas ke db
-        id_pasien = id_pasien, // Memindahkan nilai ID Pasien dari UpdateUiEvent ke Pasien
-        nama_pasien = nama_pasien,
-        alamat = alamat,
-        nomor_telepon = nomor_telepon,
-        tanggal_lahir = tanggal_lahir,
-        riwayat_medikal = riwayat_medikal
-    )
-
-    // Fungsi untuk mengubah data Pasien menjadi UpdateUiState
-    fun Pasien.toUpdateUiStatePas(): UpdateUiState = UpdateUiState( // Pasien > updateUiEvent > Masuk ke UpdateUiState
-        updateUiEvent = toUpdateUiEvent() // Memanggil fungsi toUpdateUiEvent untuk mengonversi data Pasien
-    )
-
-    // Fungsi untuk mengubah data Pasien menjadi data UpdateUiEvent
-    fun Pasien.toUpdateUiEvent(): UpdateUiEvent = UpdateUiEvent(
-        id_pasien = id_pasien, // Memindahkan nilai ID Pasien dari Pasien ke UpdateUiEvent
-        nama_pasien = nama_pasien,
-        alamat = alamat,
-        nomor_telepon = nomor_telepon,
-        tanggal_lahir = tanggal_lahir,
-        riwayat_medikal = riwayat_medikal
-    )
 }
+
+// Menyimpan state form update pasien
+data class UpdateUiState(
+    val updateUiEvent: UpdateUiEvent = UpdateUiEvent() // State default berisi objek kosong dari UpdateUiEvent
+)
+
+// Menyimpan data input pengguna untuk form update pasien
+data class UpdateUiEvent(
+    val id_pasien: String = "",
+    val nama_pasien: String = "",
+    val alamat: String = "",
+    val nomor_telepon: String = "",
+    val tanggal_lahir: String = "",
+    val riwayat_medikal: String = ""
+)
+
+// Fungsi untuk mengubah data UpdateUiEvent menjadi Pasien
+fun UpdateUiEvent.toPas(): Pasien = Pasien( // UpdateUiEvent > Pasien > Simpan data Pas ke db
+    id_pasien = id_pasien, // Memindahkan nilai NIM dari UpdateUiEvent ke Pasien
+    nama_pasien = nama_pasien,
+    alamat = alamat,
+    nomor_telepon = nomor_telepon,
+    tanggal_lahir = tanggal_lahir,
+    riwayat_medikal = riwayat_medikal
+)
+
+// Fungsi untuk mengubah data Pasien menjadi UpdateUiState
+fun Pasien.toUpdateUiStatePas(): UpdateUiState = UpdateUiState( // Pasien > updateUiEvent > Masuk ke UpdateUiState
+    updateUiEvent = toUpdateUiEvent() // Memanggil fungsi toUpdateUiEvent untuk mengonversi data Mahasiswa
+)
+
+// Fungsi untuk mengubah data Pasien menjadi data UpdateUiEvent
+fun Pasien.toUpdateUiEvent(): UpdateUiEvent = UpdateUiEvent(
+    id_pasien = id_pasien, // Memindahkan nilai NIM dari Pasien ke UpdateUiEvent
+    nama_pasien = nama_pasien,
+    alamat = alamat,
+    nomor_telepon = nomor_telepon,
+    tanggal_lahir = tanggal_lahir,
+    riwayat_medikal = riwayat_medikal
+)
