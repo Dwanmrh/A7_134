@@ -6,7 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.dwan.ta_pam.ui.view.DestinasiEntryPasien
 import com.dwan.ta_pam.ui.view.DestinasiHome
+import com.dwan.ta_pam.ui.view.EntryPasScreen
 import com.dwan.ta_pam.ui.view.HomeScreen
 
 @Composable
@@ -22,6 +24,7 @@ fun PengelolaHalaman(navController: NavHostController = rememberNavController())
         composable(DestinasiHome.route) {
             HomeScreen(
                 navigateToPasienEntry = {
+                    navController.navigate(DestinasiEntryPasien.route) // Navigasi ke EntryPasScreen
                 },
                 navigateToPasien = {
                     navController.navigate(DestinasiHome.route) // Navigasi ke Halaman Pasien
@@ -33,6 +36,17 @@ fun PengelolaHalaman(navController: NavHostController = rememberNavController())
                 navigateToSesiTerapi = {
                 },
                 onDetailClick = {
+                }
+            )
+        }
+
+        // Halaman Entry Pasien
+        composable(DestinasiEntryPasien.route) {
+            EntryPasScreen(
+                navigateBack = {
+                    navController.navigate(DestinasiHome.route) { // Navigasi kembali ke HomeScreen
+                        popUpTo(DestinasiHome.route) { inclusive = true } // Bersihkan layar sebelumnya dari back stack
+                    }
                 }
             )
         }
