@@ -32,3 +32,18 @@ class InsertPasienViewModel(private val pas: PasienRepo): ViewModel() {
         }
     }
 }
+
+// Menyimpan state form input pasien
+data class InsertUiState(
+    val insertUiEvent: InsertUiEvent = InsertUiEvent() // State default berisi objek kosong dari InsertUiEvent
+)
+
+// Menyimpan data input pengguna untuk form pasien
+data class InsertUiEvent(
+    val id_pasien: String = "",
+    val nama_pasien: String = "",
+    val alamat: String = "",
+    val nomor_telepon: String = "",
+    val tanggal_lahir: String = "",
+    val riwayat_medikal: String = ""
+)
