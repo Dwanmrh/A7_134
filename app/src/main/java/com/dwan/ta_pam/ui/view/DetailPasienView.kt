@@ -1,6 +1,7 @@
 package com.dwan.ta_pam.ui.view
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,11 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -52,7 +55,7 @@ object DestinasiDetailPasien : DestinasiNavigasi {
 fun DetailPasScreen(
     id_pasien: String,
     navigateBack: () -> Unit,
-    navigateEdit: (String) -> Unit,  // Digunakan untuk navigasi ke layar update
+    navigateToSesiEntry: () -> Unit, // Tambahkan parameter ini
     modifier: Modifier = Modifier,
     viewModel: DetailPasienViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
@@ -74,17 +77,15 @@ fun DetailPasScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    navigateEdit(id_pasien)  // Mengirim id_pasien saat ini ke fungsi navigasi
-                },
+                onClick = navigateToSesiEntry, // Gunakan parameter ini
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.padding(18.dp),
                 contentColor = Color.White,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit Pasien"
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Tambah Sesi Terapi"
                 )
             }
         }
@@ -112,7 +113,7 @@ fun DetailBodyPas(
     var deleteConfirmationRequired by remember { mutableStateOf(false) }
 
     when (detailUiState) {
-        is DetailUiState.Loading -> OnLoading(modifier = modifier)
+        is DetailUiState.Loading -> DetailPasienLoading(modifier = modifier)
         is DetailUiState.Success -> Column(
             modifier = modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -123,10 +124,10 @@ fun DetailBodyPas(
                 onClick = { deleteConfirmationRequired = true },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Tambah Sesi") // Perbaiki fungsi nya belum
+                Text(text = "Delete Data") // Perbaiki fungsi nya belum
             }
         }
-        is DetailUiState.Error -> OnError(retryAction = {}, modifier = modifier)
+        is DetailUiState.Error -> DetailPasienError(retryAction = {}, modifier = modifier)
     }
 
     if (deleteConfirmationRequired) {
@@ -217,4 +218,28 @@ private fun DeleteConfirmationDialog(
             }
         }
     )
+}
+
+@Composable
+fun DetailPasienLoading(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun DetailPasienError(retryAction: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Terjadi kesalahan. Silakan coba lagi.")
+        Button(onClick = retryAction) {
+            Text(text = "Coba Lagi")
+        }
+    }
 }
