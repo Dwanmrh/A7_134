@@ -41,6 +41,7 @@ class DetailPasienViewModel(private val pasienRepo: PasienRepo) : ViewModel() {
     }
 }
 
+// Deklarasi DetailUiState
 sealed class DetailUiState {
     object Loading : DetailUiState()
     data class Success(val pasien: Pasien) : DetailUiState()
