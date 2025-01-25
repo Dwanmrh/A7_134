@@ -173,7 +173,7 @@ fun FormInputPas(
             Text(
                 text = "Harap Mengisi Semua Data!",
                 modifier = Modifier.padding(12.dp),
-                color = Color.Green
+                color = Color.Blue
             )
         }
         // Garis pemisah tebal
