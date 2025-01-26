@@ -13,6 +13,24 @@ object PenyediaViewModel {
         initializer { InsertPasienViewModel(KlinikApplication().container.pasienRepo) }
         initializer { UpdatePasienViewModel(KlinikApplication().container.pasienRepo) }
         initializer { DetailPasienViewModel(KlinikApplication().container.pasienRepo) }
+
+        // Terapis ViewModel
+        initializer { TerapisViewModel(KlinikApplication().container.terapisRepo) }
+        initializer { InsertTerapisViewModel(KlinikApplication().container.terapisRepo) }
+        initializer { UpdateTerapisViewModel(KlinikApplication().container.terapisRepo) }
+        initializer { DetailTerapisViewModel(KlinikApplication().container.terapisRepo) }
+
+        // Jenis Terapi ViewModel
+        initializer { JenisTerapiViewModel(KlinikApplication().container.jenisTerapiRepo) }
+        initializer { InsertJenisTerapiViewModel(KlinikApplication().container.jenisTerapiRepo) }
+        initializer { UpdateJenisTerapiViewModel(KlinikApplication().container.jenisTerapiRepo) }
+        initializer { DetailJenisTerapiViewModel(KlinikApplication().container.jenisTerapiRepo) }
+
+        // Sesi Terapi ViewModel
+        initializer { SesiTerapiViewModel(KlinikApplication().container.sesiTerapiRepo) }
+        initializer { InsertSesiTerapiViewModel(KlinikApplication().container.sesiTerapiRepo) }
+        initializer { UpdateSesiTerapiViewModel(KlinikApplication().container.sesiTerapiRepo) }
+        initializer { DetailSesiTerapiViewModel(KlinikApplication().container.sesiTerapiRepo) }
     }
     fun CreationExtras.KlinikApplication(): KlinikApplication =
         (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]as KlinikApplication)
