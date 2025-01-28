@@ -9,14 +9,14 @@ import com.dwan.ta_pam.model.Pasien
 import com.dwan.ta_pam.repository.PasienRepo
 import kotlinx.coroutines.launch
 
-// ViewModel untuk mengatur data dan logika form update mahasiswa
+// ViewModel untuk mengatur data dan logika form update pasien
 class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
 
     // Data untuk menyimpan keadaan form (seperti input dari pengguna)
     var updateUiState by mutableStateOf(UpdateUiState())
         private set
 
-    // Fungsi untuk mendapatkan data mahasiswa berdasarkan NIM
+    // Fungsi untuk mendapatkan data pasien berdasarkan ID
     fun getPasienById(id_pasien: String) {
         viewModelScope.launch {
             try {
@@ -42,19 +42,19 @@ class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
         updateUiState = UpdateUiState(updateUiEvent = updateUiEvent) // Perbarui data berdasarkan event
     }
 
-    // Fungsi untuk memuat data mahasiswa ke dalam form untuk di-update
+    // Fungsi untuk memuat data pasien ke dalam form untuk di-update
     fun loadPasienData(pasien: Pasien) {
         updateUiState = pasien.toUpdateUiStatePas()
     }
 
-    // Fungsi untuk memperbarui data mahasiswa ke database
+    // Fungsi untuk memperbarui data pasien ke database
     fun updatePas() {
         viewModelScope.launch { // Menjalankan proses di latar belakang (tidak mengganggu UI)
             try {
                 // Mengambil data dari form dan mengirimnya ke repository
                 pas.updatePasien(
-                    id_pasien = updateUiState.updateUiEvent.id_pasien, // Ambil NIM dari updateUiState
-                    pasien = updateUiState.updateUiEvent.toPas() // Konversi event menjadi Mahasiswa
+                    id_pasien = updateUiState.updateUiEvent.id_pasien, // Ambil ID dari updateUiState
+                    pasien = updateUiState.updateUiEvent.toPas() // Konversi event menjadi pasien
                 )
             } catch (e: Exception) {
                 e.printStackTrace() // Menangani error jika terjadi masalah
@@ -63,12 +63,12 @@ class UpdatePasienViewModel(private val pas: PasienRepo) : ViewModel() {
     }
 }
 
-// Menyimpan state form update mahasiswa
+// Menyimpan state form update pasien
 data class UpdateUiState(
     val updateUiEvent: UpdateUiEvent = UpdateUiEvent() // State default berisi objek kosong dari UpdateUiEvent
 )
 
-// Menyimpan data input pengguna untuk form update mahasiswa
+// Menyimpan data input pengguna untuk form update pasien
 data class UpdateUiEvent(
     val id_pasien: String = "",
     val nama_pasien: String = "",
@@ -78,9 +78,9 @@ data class UpdateUiEvent(
     val riwayat_medikal: String = ""
 )
 
-// Fungsi untuk mengubah data UpdateUiEvent menjadi Mahasiswa
-fun UpdateUiEvent.toPas(): Pasien = Pasien( // UpdateUiEvent > Mahasiswa > Simpan data Pas ke db
-    id_pasien = id_pasien, // Memindahkan nilai NIM dari UpdateUiEvent ke Mahasiswa
+// Fungsi untuk mengubah data UpdateUiEvent menjadi pasien
+fun UpdateUiEvent.toPas(): Pasien = Pasien( // UpdateUiEvent > pasien > Simpan data Pas ke db
+    id_pasien = id_pasien, // Memindahkan nilai ID dari UpdateUiEvent ke pasien
     nama_pasien = nama_pasien,
     alamat = alamat,
     nomor_telepon = nomor_telepon,
@@ -88,14 +88,14 @@ fun UpdateUiEvent.toPas(): Pasien = Pasien( // UpdateUiEvent > Mahasiswa > Simpa
     riwayat_medikal = riwayat_medikal
 )
 
-// Fungsi untuk mengubah data Mahasiswa menjadi UpdateUiState
-fun Pasien.toUpdateUiStatePas(): UpdateUiState = UpdateUiState( // Mahasiswa > updateUiEvent > Masuk ke UpdateUiState
-    updateUiEvent = toUpdateUiEvent() // Memanggil fungsi toUpdateUiEvent untuk mengonversi data Mahasiswa
+// Fungsi untuk mengubah data pasien menjadi UpdateUiState
+fun Pasien.toUpdateUiStatePas(): UpdateUiState = UpdateUiState( // pasien > updateUiEvent > Masuk ke UpdateUiState
+    updateUiEvent = toUpdateUiEvent() // Memanggil fungsi toUpdateUiEvent untuk mengonversi data pasien
 )
 
-// Fungsi untuk mengubah data Mahasiswa menjadi data UpdateUiEvent
+// Fungsi untuk mengubah data pasien menjadi data UpdateUiEvent
 fun Pasien.toUpdateUiEvent(): UpdateUiEvent = UpdateUiEvent(
-    id_pasien = id_pasien, // Memindahkan nilai NIM dari Mahasiswa ke UpdateUiEvent
+    id_pasien = id_pasien, // Memindahkan nilai ID dari pasien ke UpdateUiEvent
     nama_pasien = nama_pasien,
     alamat = alamat,
     nomor_telepon = nomor_telepon,
