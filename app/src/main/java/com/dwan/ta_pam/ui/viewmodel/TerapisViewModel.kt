@@ -25,7 +25,7 @@ sealed class HomeTUiState{ // Digunakan untuk membatasi subclass yang dapat di-e
 
 class TerapisViewModel(private val trps: TerapisRepo): ViewModel() {
 
-    // mhsUiState digunakan untuk menyimpan keadaan UI (state) mahasiswa.
+    // mhsUiState digunakan untuk menyimpan keadaan UI (state) terapis.
     // mutableStateOf digunakan untuk membuat state yang dapat berubah dan otomatis memicu pembaruan UI ketika nilainya berubah.
     // State awalnya diset ke HomeUiState.Loading.
     var terUiState: HomeTUiState by mutableStateOf(HomeTUiState.Loading)
@@ -41,10 +41,10 @@ class TerapisViewModel(private val trps: TerapisRepo): ViewModel() {
             // Set state ke Loading untuk menunjukkan bahwa data sedang diproses.
             terUiState = HomeTUiState.Loading
 
-            // Mencoba mengambil data mahasiswa dari repository menggunakan blok try-catch.
+            // Mencoba mengambil data terapis dari repository menggunakan blok try-catch.
             terUiState = try {
 
-                // Jika berhasil, state diubah menjadi Success dengan daftar mahasiswa sebagai datanya.
+                // Jika berhasil, state diubah menjadi Success dengan daftar terapis sebagai datanya.
                 HomeTUiState.Success(trps.getTerapis())
             }catch (e: IOException) {
 
@@ -64,7 +64,7 @@ class TerapisViewModel(private val trps: TerapisRepo): ViewModel() {
             // Menggunakan blok try-catch untuk menangani kemungkinan kesalahan selama proses penghapusan.
             try {
 
-                // Memanggil fungsi deleteMahasiswa pada repository untuk menghapus data mahasiswa berdasarkan NIM.
+                // Memanggil fungsi terapis pada repository untuk menghapus data terapis berdasarkan ID.
                 trps.deleteTerapis(id_terapis)
             }catch (e: IOException) {
                 HomeTUiState.Error
