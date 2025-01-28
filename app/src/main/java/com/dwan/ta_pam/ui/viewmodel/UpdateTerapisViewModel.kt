@@ -9,14 +9,14 @@ import com.dwan.ta_pam.model.Terapis
 import com.dwan.ta_pam.repository.TerapisRepo
 import kotlinx.coroutines.launch
 
-// ViewModel untuk mengatur data dan logika form update mahasiswa
+// ViewModel untuk mengatur data dan logika form update terapis
 class UpdateTerapisViewModel(private val trps: TerapisRepo) : ViewModel() {
 
     // Data untuk menyimpan keadaan form (seperti input dari pengguna)
     var updateTUiState by mutableStateOf(UpdateTUiState())
         private set
 
-    // Fungsi untuk mendapatkan data mahasiswa berdasarkan NIM
+    // Fungsi untuk mendapatkan data terapis berdasarkan ID
     fun getTerapisById(id_terapis: String) {
         viewModelScope.launch {
             try {
@@ -40,19 +40,19 @@ class UpdateTerapisViewModel(private val trps: TerapisRepo) : ViewModel() {
         updateTUiState = UpdateTUiState(updateTUiEvent = updateTUiEvent) // Perbarui data berdasarkan event
     }
 
-    // Fungsi untuk memuat data mahasiswa ke dalam form untuk di-update
+    // Fungsi untuk memuat data terapis ke dalam form untuk di-update
     fun loadTerapisData(terapis: Terapis) {
         updateTUiState = terapis.toUpdateUiStateTerapis()
     }
 
-    // Fungsi untuk memperbarui data mahasiswa ke database
+    // Fungsi untuk memperbarui data terapis ke database
     fun updateTerapis() {
         viewModelScope.launch { // Menjalankan proses di latar belakang (tidak mengganggu UI)
             try {
                 // Mengambil data dari form dan mengirimnya ke repository
                 trps.updateTerapis(
-                    id_terapis = updateTUiState.updateTUiEvent.id_terapis, // Ambil NIM dari updateUiState
-                    terapis = updateTUiState.updateTUiEvent.toTrps() // Konversi event menjadi Mahasiswa
+                    id_terapis = updateTUiState.updateTUiEvent.id_terapis, // Ambil ID dari updateUiState
+                    terapis = updateTUiState.updateTUiEvent.toTrps() // Konversi event menjadi terapis
                 )
             } catch (e: Exception) {
                 e.printStackTrace() // Menangani error jika terjadi masalah
@@ -66,7 +66,7 @@ data class UpdateTUiState(
     val updateTUiEvent: UpdateTUiEvent = UpdateTUiEvent() // State default berisi objek kosong dari UpdateUiEvent
 )
 
-// Menyimpan data input pengguna untuk form update mahasiswa
+// Menyimpan data input pengguna untuk form update terapis
 data class UpdateTUiEvent(
     val id_terapis: String = "",
     val nama_terapis: String = "",
@@ -74,22 +74,22 @@ data class UpdateTUiEvent(
     val nomor_izin_praktik: String = ""
 )
 
-// Fungsi untuk mengubah data UpdateUiEvent menjadi Mahasiswa
-fun UpdateTUiEvent.toTrps(): Terapis = Terapis( // UpdateUiEvent > Mahasiswa > Simpan data Pas ke db
-    id_terapis = id_terapis, // Memindahkan nilai NIM dari UpdateUiEvent ke Mahasiswa
+// Fungsi untuk mengubah data UpdateUiEvent menjadi terapis
+fun UpdateTUiEvent.toTrps(): Terapis = Terapis( // UpdateUiEvent > terapis > Simpan data Pas ke db
+    id_terapis = id_terapis, // Memindahkan nilai ID dari UpdateUiEvent ke terapis
     nama_terapis = nama_terapis,
     spesialisasi = spesialisasi,
     nomor_izin_praktik = nomor_izin_praktik
 )
 
-// Fungsi untuk mengubah data Mahasiswa menjadi UpdateUiState
-fun Terapis.toUpdateUiStateTerapis(): UpdateTUiState = UpdateTUiState( // Mahasiswa > updateUiEvent > Masuk ke UpdateUiState
-    updateTUiEvent = toUpdateTUiEvent() // Memanggil fungsi toUpdateUiEvent untuk mengonversi data Mahasiswa
+// Fungsi untuk mengubah data terapis menjadi UpdateUiState
+fun Terapis.toUpdateUiStateTerapis(): UpdateTUiState = UpdateTUiState( // terapis > updateUiEvent > Masuk ke UpdateUiState
+    updateTUiEvent = toUpdateTUiEvent() // Memanggil fungsi toUpdateUiEvent untuk mengonversi data terapis
 )
 
-// Fungsi untuk mengubah data Mahasiswa menjadi data UpdateUiEvent
+// Fungsi untuk mengubah data terapis menjadi data UpdateUiEvent
 fun Terapis.toUpdateTUiEvent(): UpdateTUiEvent = UpdateTUiEvent(
-    id_terapis = id_terapis, // Memindahkan nilai NIM dari Mahasiswa ke UpdateUiEvent
+    id_terapis = id_terapis, // Memindahkan nilai ID dari terapis ke UpdateUiEvent
     nama_terapis = nama_terapis,
     spesialisasi = spesialisasi,
     nomor_izin_praktik = nomor_izin_praktik
