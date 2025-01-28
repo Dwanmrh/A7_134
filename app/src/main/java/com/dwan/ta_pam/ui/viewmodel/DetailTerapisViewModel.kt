@@ -2,7 +2,6 @@ package com.dwan.ta_pam.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dwan.ta_pam.model.Pasien
 import com.dwan.ta_pam.model.Terapis
 import com.dwan.ta_pam.repository.TerapisRepo
 import kotlinx.coroutines.flow.MutableStateFlow
