@@ -1,25 +1,25 @@
 package com.dwan.ta_pam.ui.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40,12 +40,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dwan.ta_pam.model.Pasien
 import com.dwan.ta_pam.ui.customwidget.CustomTopAppBar
+import com.dwan.ta_pam.ui.customwidget.MenuButton
 import com.dwan.ta_pam.ui.navigation.DestinasiNavigasi
 import com.dwan.ta_pam.ui.viewmodel.DetailPasienViewModel
 import com.dwan.ta_pam.ui.viewmodel.DetailUiState
 import com.dwan.ta_pam.ui.viewmodel.PenyediaViewModel
 
-object DestinasiDetailPasien : DestinasiNavigasi {
+object DestinasiDetail : DestinasiNavigasi {
     override val route = "detail_pasien"
     override val titleRes = "Detail Pasien"
 }
@@ -54,8 +55,12 @@ object DestinasiDetailPasien : DestinasiNavigasi {
 @Composable
 fun DetailPasScreen(
     id_pasien: String,
+    navigateToPasien: () -> Unit,
+    navigateToTerapis: () -> Unit,
+    navigateToJenisTerapi: () -> Unit,
+    navigateToSesiTerapi: () -> Unit,
     navigateBack: () -> Unit,
-    navigateToSesiEntry: () -> Unit, // Tambahkan parameter ini
+    navigateSesi: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DetailPasienViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
@@ -66,10 +71,12 @@ fun DetailPasScreen(
     }
 
     Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .background(Color(0xFF121212)), // Warna latar belakang gelap
         topBar = {
             CustomTopAppBar(
-                title = DestinasiDetailPasien.titleRes,
+                title = DestinasiDetail.titleRes,
                 canNavigateBack = true,
                 scrollBehavior = scrollBehavior,
                 navigateUp = navigateBack
@@ -77,17 +84,27 @@ fun DetailPasScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = navigateToSesiEntry, // Gunakan parameter ini
-                shape = MaterialTheme.shapes.medium,
+                onClick = {
+                    navigateSesi(DestinasiEntrySesiTerapi.route)
+                },
+                shape = CircleShape,
                 modifier = Modifier.padding(18.dp),
-                contentColor = Color.White,
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = Color(0xFF8B0000),
+                contentColor = Color.White
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Tambah Sesi Terapi"
+                    contentDescription = "Tambah Sesi"
                 )
             }
+        },
+        bottomBar = {
+            MenuButton(
+                onPasienClick = navigateToPasien,
+                onTerapisClick = navigateToTerapis,
+                onJenisTerapiClick = navigateToJenisTerapi,
+                onSesiTerapiClick = navigateToSesiTerapi,
+            )
         }
     ) { innerPadding ->
         val detailUiState = viewModel.detailUiState.collectAsState().value
@@ -113,7 +130,7 @@ fun DetailBodyPas(
     var deleteConfirmationRequired by remember { mutableStateOf(false) }
 
     when (detailUiState) {
-        is DetailUiState.Loading -> DetailPasienLoading(modifier = modifier)
+        is DetailUiState.Loading -> OnLoading(modifier = modifier)
         is DetailUiState.Success -> Column(
             modifier = modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -122,12 +139,16 @@ fun DetailBodyPas(
             DetailContentPas(pasien = detailUiState.pasien)
             Button(
                 onClick = { deleteConfirmationRequired = true },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF8B0000), // Warna merah gelap
+                    contentColor = Color.White // Warna teks putih
+                )
             ) {
-                Text(text = "Delete Data") // Perbaiki fungsi nya belum
+                Text(text = "Delete Data")
             }
         }
-        is DetailUiState.Error -> DetailPasienError(retryAction = {}, modifier = modifier)
+        is DetailUiState.Error -> OnError(retryAction = {}, modifier = modifier)
     }
 
     if (deleteConfirmationRequired) {
@@ -145,9 +166,10 @@ fun DetailBodyPas(
 fun DetailContentPas(pasien: Pasien, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            contentColor = Color.White,
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = Color(0xFF8B0000), // Warna merah gelap
+            contentColor = Color.White // Warna teks putih
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -204,42 +226,21 @@ private fun DeleteConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = { },
-        title = { Text("Delete Data") },
-        text = { Text("Apakah anda yakin ingin menghapus data?") },
+        title = { Text("Delete Data", color = Color.White) },
+        text = { Text("Apakah anda yakin ingin menghapus data ini?", color = Color.White) },
         modifier = modifier,
         dismissButton = {
             TextButton(onClick = onDeleteCancel) {
-                Text(text = "Cancel")
+                Text(text = "Cancel", color = Color.White)
             }
         },
         confirmButton = {
             TextButton(onClick = onDeleteConfirm) {
-                Text(text = "Yes")
+                Text(text = "Yes", color = Color.White)
             }
-        }
+        },
+        containerColor = Color(0xFF8B0000), // Warna merah gelap
+        textContentColor = Color.White, // Warna teks putih
+        titleContentColor = Color.White // Warna teks putih
     )
-}
-
-@Composable
-fun DetailPasienLoading(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-fun DetailPasienError(retryAction: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "Terjadi kesalahan. Silakan coba lagi.")
-        Button(onClick = retryAction) {
-            Text(text = "Coba Lagi")
-        }
-    }
 }
