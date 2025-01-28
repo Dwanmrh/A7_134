@@ -16,6 +16,7 @@ class DetailPasienViewModel(private val pasienRepo: PasienRepo) : ViewModel() {
 
     fun getPasienById(id_pasien: String) {
         viewModelScope.launch {
+            _detailUiState.value = DetailUiState.Loading
             try {
                 val pasien = pasienRepo.getPasienById(id_pasien)
                 if (pasien != null) {
