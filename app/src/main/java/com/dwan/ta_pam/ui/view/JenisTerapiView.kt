@@ -3,6 +3,7 @@ package com.dwan.ta_pam.ui.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,10 +17,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -50,15 +54,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dwan.ta_pam.R
 import com.dwan.ta_pam.model.JenisTerapi
-import com.dwan.ta_pam.model.Terapis
 import com.dwan.ta_pam.ui.customwidget.CustomTopAppBar
 import com.dwan.ta_pam.ui.customwidget.MenuButton
 import com.dwan.ta_pam.ui.navigation.DestinasiNavigasi
 import com.dwan.ta_pam.ui.viewmodel.HomeJUiState
-import com.dwan.ta_pam.ui.viewmodel.HomeTUiState
 import com.dwan.ta_pam.ui.viewmodel.JenisTerapiViewModel
 import com.dwan.ta_pam.ui.viewmodel.PenyediaViewModel
-import com.dwan.ta_pam.ui.viewmodel.TerapisViewModel
 
 // Objek untuk mendefinisikan rute dan judul layar home
 object DestinasiJenisTerapi : DestinasiNavigasi {
@@ -69,64 +70,58 @@ object DestinasiJenisTerapi : DestinasiNavigasi {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JenisTerapiScreen(
-    navigateToJenisTerapiEntry: () -> Unit, // Navigasi ke layar tambah data
-    navigateToPasien: () -> Unit, // Navigasi ke halaman Pasien
-    navigateToTerapis: () -> Unit, // Navigasi ke halaman Terapis
-    navigateToJenisTerapi: () -> Unit, // Navigasi ke halaman Jenis Terapi
-    navigateToSesiTerapi: () -> Unit, // Navigasi ke halaman Sesi Terapi
+    navigateToJenisTerapiEntry: () -> Unit,
+    navigateToPasien: () -> Unit,
+    navigateToTerapis: () -> Unit,
+    navigateToJenisTerapi: () -> Unit,
+    navigateToSesiTerapi: () -> Unit,
     modifier: Modifier = Modifier,
-    navigateToUpdateJenisTerapi: (String) -> Unit, // Navigasi ke halaman update
+    navigateToUpdateJenisTerapi: (String) -> Unit,
     onDetailJenisTerapiClick: (String) -> Unit,
-    viewModel: JenisTerapiViewModel = viewModel(factory = PenyediaViewModel.Factory) // ViewModel untuk mengelola data
+    viewModel: JenisTerapiViewModel = viewModel(factory = PenyediaViewModel.Factory)
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         modifier = modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .background(MaterialTheme.colorScheme.background),
+            .background(Color(0xFF121212)), // Warna latar belakang gelap
         topBar = {
-            CustomTopAppBar( // Toolbar dengan tombol refresh
+            CustomTopAppBar(
                 title = DestinasiJenisTerapi.titleRes,
                 canNavigateBack = false,
                 scrollBehavior = scrollBehavior,
                 onRefresh = {
-                    viewModel.getJns() // Memuat ulang data terapis
+                    viewModel.getJns()
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = navigateToJenisTerapiEntry,
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.padding(18.dp),
-                contentColor = Color.White,
-                containerColor = MaterialTheme.colorScheme.primary
+                navigateToJenisTerapiEntry,
+                Modifier.padding(18.dp), CircleShape,
+                containerColor = Color(0xFF8B0000),
+                contentColor = Color.White // Warna teks putih
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Terapis")
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Jenis Terapi")
             }
         },
-        // Menambahkan MenuButton di bagian bawah FAB
         bottomBar = {
             MenuButton(
                 onPasienClick = navigateToPasien,
                 onTerapisClick = navigateToTerapis,
                 onJenisTerapiClick = navigateToJenisTerapi,
                 onSesiTerapiClick = navigateToSesiTerapi,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
             )
         }
     ) { innerPadding ->
-        // Menampilkan status data mahasiswa
         JenisTerapiStatus(
             homeJUiState = viewModel.jnsUiState,
             retryAction = { viewModel.getJns() },
             modifier = Modifier.padding(innerPadding),
             onDetailJenisTerapiClick = onDetailJenisTerapiClick,
             onDeleteClick = { jenis_terapi ->
-                viewModel.deleteJns(jenis_terapi.id_jenis_terapi) // Menghapus data mahasiswa
-                viewModel.getJns() // Memuat ulang data setelah dihapus
+                viewModel.deleteJns(jenis_terapi.id_jenis_terapi)
+                viewModel.getJns()
             },
             navigateToUpdateJenisTerapi = navigateToUpdateJenisTerapi
         )
@@ -135,23 +130,21 @@ fun JenisTerapiScreen(
 
 @Composable
 fun JenisTerapiStatus(
-    homeJUiState: HomeJUiState, // Status data mahasiswa
-    retryAction: () -> Unit, // Aksi untuk memuat ulang
+    homeJUiState: HomeJUiState,
+    retryAction: () -> Unit,
     navigateToUpdateJenisTerapi: (String) -> Unit,
     modifier: Modifier = Modifier,
     onDeleteClick: (JenisTerapi) -> Unit = {},
     onDetailJenisTerapiClick: (String) -> Unit
 ) {
     when (homeJUiState) {
-        is HomeJUiState.Loading -> JenisTerapiLoading(modifier = modifier.fillMaxSize()) // Menampilkan loading
+        is HomeJUiState.Loading -> JenisTerapiLoading(modifier = modifier.fillMaxSize())
         is HomeJUiState.Success -> {
             if (homeJUiState.jenisTerapi.isEmpty()) {
-                // Tampilkan pesan jika data kosong
                 Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Tidak ada data Jenis Terapi")
+                    Text(text = "Tidak ada data Jenis Terapi", color = Color.White)
                 }
             } else {
-                // Tampilkan daftar mahasiswa
                 JenisTerapiLayout(
                     jenisTerapi = homeJUiState.jenisTerapi,
                     modifier = modifier.fillMaxWidth(),
@@ -161,7 +154,7 @@ fun JenisTerapiStatus(
                 )
             }
         }
-        is HomeJUiState.Error -> JenisTerapiError(retryAction, modifier = modifier.fillMaxSize()) // Tampilkan pesan error
+        is HomeJUiState.Error -> JenisTerapiError(retryAction, modifier = modifier.fillMaxSize())
     }
 }
 
@@ -174,7 +167,7 @@ fun JenisTerapiLoading(
         contentAlignment = Alignment.Center
     ) {
         Image(
-            modifier = Modifier.size(70.dp), // Ukuran eksplisit di sini
+            modifier = Modifier.size(70.dp),
             painter = painterResource(id = R.drawable.loading_img),
             contentDescription = stringResource(R.string.loading)
         )
@@ -191,9 +184,9 @@ fun JenisTerapiError(retryAction: () -> Unit, modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
         )
-        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
+        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp), color = Color.White)
         Button(onClick = retryAction) {
-            Text(stringResource(R.string.retry))
+            Text(stringResource(R.string.retry), color = Color.White)
         }
     }
 }
@@ -217,8 +210,9 @@ fun JenisTerapiLayout(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { onDetailJenisTerapiClick(jenisTerapi) },
-                navigateToUpdateJenisTerapi = navigateToUpdateJenisTerapi, // Fungsi klik untuk update
-                onDeleteClick = { onDeleteClick(jenisTerapi) }
+                navigateToUpdateJenisTerapi = navigateToUpdateJenisTerapi,
+                onDeleteClick = { onDeleteClick(jenisTerapi) },
+                onDetailJenisTerapiClick = onDetailJenisTerapiClick
             )
         }
     }
@@ -226,40 +220,44 @@ fun JenisTerapiLayout(
 
 @Composable
 fun JenisTerapiCard(
-    jenisTerapi: JenisTerapi, // Data Terapis
+    jenisTerapi: JenisTerapi,
     modifier: Modifier = Modifier,
     navigateToUpdateJenisTerapi: (String) -> Unit,
-    onDeleteClick: (JenisTerapi) -> Unit = {}
+    onDeleteClick: (JenisTerapi) -> Unit = {},
+    onDetailJenisTerapiClick: (JenisTerapi) -> Unit
 ) {
-    // State untuk menampilkan dialog konfirmasi
     var deleteConfirmationRequired by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .shadow(8.dp, shape = MaterialTheme.shapes.medium), // Tambahkan bayangan
-        shape = MaterialTheme.shapes.medium,
+            .shadow(8.dp, shape = RoundedCornerShape(16.dp))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(color = Color.White),
+                onClick = {onDetailJenisTerapiClick(jenisTerapi)}
+            ),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary // Warna latar belakang kartu
+            containerColor = Color(0xFF8B0000), // Warna merah gelap
+            contentColor = Color.White // Warna teks putih
         )
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Gambar profil
             Image(
-                painter = painterResource(id = R.drawable.profile),
+                painter = painterResource(id = R.drawable.jenis_terapi),
                 contentDescription = "Foto Jenis Terapi",
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(MaterialTheme.shapes.small) // Bentuk lingkaran
+                    .clip(MaterialTheme.shapes.small)
             )
 
-            Spacer(Modifier.width(16.dp)) // Jarak antar elemen
+            Spacer(Modifier.width(16.dp))
 
-            // Informasi Jenis Terapi
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -267,28 +265,26 @@ fun JenisTerapiCard(
                 Text(
                     text = jenisTerapi.nama_jenis_terapi,
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.secondaryContainer // Warna teks
+                    color = Color.White
                 )
                 Text(
                     text = jenisTerapi.id_jenis_terapi,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondaryContainer
+                    color = Color.White.copy(alpha = 0.8f)
                 )
             }
 
-            // Tombol Edit
             IconButton(
-                onClick = { navigateToUpdateJenisTerapi(jenisTerapi.id_jenis_terapi) }, // Navigasi ke halaman update
+                onClick = { navigateToUpdateJenisTerapi(jenisTerapi.id_jenis_terapi) },
                 modifier = Modifier.size(32.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit Jenis Terapi",
-                    tint = MaterialTheme.colorScheme.error
+                    tint = Color.White
                 )
             }
 
-            // Tombol hapus
             IconButton(
                 onClick = { deleteConfirmationRequired = true },
                 modifier = Modifier.size(32.dp)
@@ -296,13 +292,12 @@ fun JenisTerapiCard(
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error // Warna ikon
+                    tint = Color.White
                 )
             }
         }
     }
 
-    // Dialog konfirmasi hapus
     if (deleteConfirmationRequired) {
         DeleteConfirmationDialog(
             onDeleteConfirm = {
@@ -322,18 +317,21 @@ private fun DeleteConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = { onDeleteCancel() },
-        title = { Text("Delete Data") },
-        text = { Text("Apakah anda yakin ingin menghapus data ini?") },
+        title = { Text("Delete Data", color = Color.White) },
+        text = { Text("Apakah anda yakin ingin menghapus data ini?", color = Color.White) },
         modifier = modifier,
         dismissButton = {
             TextButton(onClick = onDeleteCancel) {
-                Text(text = "Cancel")
+                Text(text = "Cancel", color = Color.White)
             }
         },
         confirmButton = {
             TextButton(onClick = onDeleteConfirm) {
-                Text(text = "Yes")
+                Text(text = "Yes", color = Color.White)
             }
-        }
+        },
+        containerColor = Color(0xFF8B0000), // Warna merah gelap
+        textContentColor = Color.White, // Warna teks putih
+        titleContentColor = Color.White // Warna teks putih
     )
 }
