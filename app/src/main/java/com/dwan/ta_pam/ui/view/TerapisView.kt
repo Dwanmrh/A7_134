@@ -3,6 +3,7 @@ package com.dwan.ta_pam.ui.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,10 +17,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -49,7 +53,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dwan.ta_pam.R
-import com.dwan.ta_pam.model.Pasien
 import com.dwan.ta_pam.model.Terapis
 import com.dwan.ta_pam.ui.customwidget.CustomTopAppBar
 import com.dwan.ta_pam.ui.customwidget.MenuButton
@@ -81,7 +84,7 @@ fun TerapisScreen(
     Scaffold(
         modifier = modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .background(MaterialTheme.colorScheme.background),
+            .background(Color(0xFF121212)), // Warna latar belakang gelap
         topBar = {
             CustomTopAppBar( // Toolbar dengan tombol refresh
                 title = DestinasiTerapis.titleRes,
@@ -95,10 +98,10 @@ fun TerapisScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = navigateToTerapisEntry,
-                shape = MaterialTheme.shapes.medium,
+                shape = CircleShape,
                 modifier = Modifier.padding(18.dp),
-                contentColor = Color.White,
-                containerColor = MaterialTheme.colorScheme.primary
+                containerColor = Color(0xFF8B0000),
+                contentColor = Color.White // Warna teks putih
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Terapis")
             }
@@ -110,20 +113,17 @@ fun TerapisScreen(
                 onTerapisClick = navigateToTerapis,
                 onJenisTerapiClick = navigateToJenisTerapi,
                 onSesiTerapiClick = navigateToSesiTerapi,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
             )
         }
     ) { innerPadding ->
-        // Menampilkan status data mahasiswa
+        // Menampilkan status data terapis
         TerapisStatus(
             homeTUiState = viewModel.terUiState,
             retryAction = { viewModel.getTer() },
             modifier = Modifier.padding(innerPadding),
             onDetailTerapisClick = onDetailTerapisClick,
             onDeleteClick = { terapis ->
-                viewModel.deleteTer(terapis.id_terapis) // Menghapus data mahasiswa
+                viewModel.deleteTer(terapis.id_terapis) // Menghapus data terapis
                 viewModel.getTer() // Memuat ulang data setelah dihapus
             },
             navigateToUpdateTerapis = navigateToUpdateTerapis
@@ -133,7 +133,7 @@ fun TerapisScreen(
 
 @Composable
 fun TerapisStatus(
-    homeTUiState: HomeTUiState, // Status data mahasiswa
+    homeTUiState: HomeTUiState, // Status data terapis
     retryAction: () -> Unit, // Aksi untuk memuat ulang
     navigateToUpdateTerapis: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -146,10 +146,10 @@ fun TerapisStatus(
             if (homeTUiState.terapis.isEmpty()) {
                 // Tampilkan pesan jika data kosong
                 Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = "Tidak ada data Terapis")
+                    Text(text = "Tidak ada data Terapis", color = Color.White)
                 }
             } else {
-                // Tampilkan daftar mahasiswa
+                // Tampilkan daftar terapis
                 TerapisLayout(
                     terapis = homeTUiState.terapis,
                     modifier = modifier.fillMaxWidth(),
@@ -189,9 +189,9 @@ fun TerapisError(retryAction: () -> Unit, modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(id = R.drawable.ic_connection_error), contentDescription = ""
         )
-        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp))
+        Text(text = stringResource(R.string.loading_failed), modifier = Modifier.padding(16.dp), color = Color.White)
         Button(onClick = retryAction) {
-            Text(stringResource(R.string.retry))
+            Text(stringResource(R.string.retry), color = Color.White)
         }
     }
 }
@@ -213,10 +213,10 @@ fun TerapisLayout(
             TerapisCard(
                 terapis = terapis,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onDetailTerapisClick(terapis) },
+                    .fillMaxWidth(),
                 navigateToUpdateTerapis = navigateToUpdateTerapis, // Fungsi klik untuk update
-                onDeleteClick = { onDeleteClick(terapis) }
+                onDeleteClick = { onDeleteClick(terapis) },
+                onDetailTerapisClick = onDetailTerapisClick
             )
         }
     }
@@ -227,19 +227,24 @@ fun TerapisCard(
     terapis: Terapis, // Data Terapis
     modifier: Modifier = Modifier,
     navigateToUpdateTerapis: (String) -> Unit,
-    onDeleteClick: (Terapis) -> Unit = {}
+    onDeleteClick: (Terapis) -> Unit = {},
+    onDetailTerapisClick: (Terapis) -> Unit
 ) {
-    // State untuk menampilkan dialog konfirmasi
     var deleteConfirmationRequired by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .shadow(8.dp, shape = MaterialTheme.shapes.medium), // Tambahkan bayangan
-        shape = MaterialTheme.shapes.medium,
+            .shadow(8.dp, shape = RoundedCornerShape(16.dp))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(color = Color.White) // Efek ripple putih
+            ) { onDetailTerapisClick(terapis) },
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary // Warna latar belakang kartu
+            containerColor = Color(0xFF8B0000), // Warna merah gelap
+            contentColor = Color.White // Warna teks putih
         )
     ) {
         Row(
@@ -248,7 +253,7 @@ fun TerapisCard(
         ) {
             // Gambar profil
             Image(
-                painter = painterResource(id = R.drawable.profile),
+                painter = painterResource(id = R.drawable.terapis),
                 contentDescription = "Foto Terapis",
                 modifier = Modifier
                     .size(48.dp)
@@ -257,7 +262,7 @@ fun TerapisCard(
 
             Spacer(Modifier.width(16.dp)) // Jarak antar elemen
 
-            // Informasi Mahasiswa
+            // Informasi Terapis
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -265,38 +270,38 @@ fun TerapisCard(
                 Text(
                     text = terapis.nama_terapis,
                     style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.secondaryContainer // Warna teks
+                    color = Color.White // Warna teks putih
                 )
                 Text(
                     text = terapis.id_terapis,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondaryContainer
+                    color = Color.White.copy(alpha = 0.8f) // Warna teks putih dengan transparansi
                 )
                 Text(
                     text = terapis.spesialisasi,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondaryContainer
+                    color = Color.White.copy(alpha = 0.8f) // Warna teks putih dengan transparansi
                 )
                 Text(
                     text = terapis.nomor_izin_praktik,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondaryContainer
+                    color = Color.White.copy(alpha = 0.8f) // Warna teks putih dengan transparansi
                 )
             }
 
             // Tombol Edit
             IconButton(
-                onClick = { navigateToUpdateTerapis(terapis.id_terapis) }, // Navigasi ke halaman update
+                onClick = { navigateToUpdateTerapis(terapis.id_terapis) },
                 modifier = Modifier.size(32.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Edit,
-                    contentDescription = "Edit Pasien",
-                    tint = MaterialTheme.colorScheme.error
+                    contentDescription = "Edit Terapis",
+                    tint = Color.White // Warna ikon putih
                 )
             }
 
-            // Tombol hapus
+            // Tombol Hapus
             IconButton(
                 onClick = { deleteConfirmationRequired = true },
                 modifier = Modifier.size(32.dp)
@@ -304,7 +309,7 @@ fun TerapisCard(
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error // Warna ikon
+                    tint = Color.White // Warna ikon putih
                 )
             }
         }
@@ -330,18 +335,21 @@ private fun DeleteConfirmationDialog(
 ) {
     AlertDialog(
         onDismissRequest = { onDeleteCancel() },
-        title = { Text("Delete Data") },
-        text = { Text("Apakah anda yakin ingin menghapus data ini?") },
+        title = { Text("Delete Data", color = Color.White) },
+        text = { Text("Apakah anda yakin ingin menghapus data ini?", color = Color.White) },
         modifier = modifier,
         dismissButton = {
             TextButton(onClick = onDeleteCancel) {
-                Text(text = "Cancel")
+                Text(text = "Cancel", color = Color.White)
             }
         },
         confirmButton = {
             TextButton(onClick = onDeleteConfirm) {
-                Text(text = "Yes")
+                Text(text = "Yes", color = Color.White)
             }
-        }
+        },
+        containerColor = Color(0xFF8B0000), // Warna merah gelap
+        textContentColor = Color.White, // Warna teks putih
+        titleContentColor = Color.White // Warna teks putih
     )
 }
