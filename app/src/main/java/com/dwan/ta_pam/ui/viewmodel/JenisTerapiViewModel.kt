@@ -25,7 +25,7 @@ sealed class HomeJUiState{ // Digunakan untuk membatasi subclass yang dapat di-e
 
 class JenisTerapiViewModel(private val jns: JenisTerapiRepo): ViewModel() {
 
-    // mhsUiState digunakan untuk menyimpan keadaan UI (state) mahasiswa.
+    // jnsUiState digunakan untuk menyimpan keadaan UI (state) jenis terapi.
     // mutableStateOf digunakan untuk membuat state yang dapat berubah dan otomatis memicu pembaruan UI ketika nilainya berubah.
     // State awalnya diset ke HomeUiState.Loading.
     var jnsUiState: HomeJUiState by mutableStateOf(HomeJUiState.Loading)
@@ -41,10 +41,10 @@ class JenisTerapiViewModel(private val jns: JenisTerapiRepo): ViewModel() {
             // Set state ke Loading untuk menunjukkan bahwa data sedang diproses.
             jnsUiState = HomeJUiState.Loading
 
-            // Mencoba mengambil data mahasiswa dari repository menggunakan blok try-catch.
+            // Mencoba mengambil data jenis terapi dari repository menggunakan blok try-catch.
             jnsUiState = try {
 
-                // Jika berhasil, state diubah menjadi Success dengan daftar mahasiswa sebagai datanya.
+                // Jika berhasil, state diubah menjadi Success dengan daftar jenis terapi sebagai datanya.
                 HomeJUiState.Success(jns.getJenis())
             }catch (e: IOException) {
 
@@ -64,7 +64,7 @@ class JenisTerapiViewModel(private val jns: JenisTerapiRepo): ViewModel() {
             // Menggunakan blok try-catch untuk menangani kemungkinan kesalahan selama proses penghapusan.
             try {
 
-                // Memanggil fungsi deleteMahasiswa pada repository untuk menghapus data mahasiswa berdasarkan NIM.
+                // Memanggil fungsi jenis terapi pada repository untuk menghapus data jenis terapi berdasarkan ID.
                 jns.deleteJenis(id_jenis_terapi)
             }catch (e: IOException) {
                 HomeTUiState.Error
