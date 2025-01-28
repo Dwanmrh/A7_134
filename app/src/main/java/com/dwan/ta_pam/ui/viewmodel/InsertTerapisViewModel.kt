@@ -9,7 +9,7 @@ import com.dwan.ta_pam.model.Terapis
 import com.dwan.ta_pam.repository.TerapisRepo
 import kotlinx.coroutines.launch
 
-// ViewModel untuk mengatur data dan logika form tambah mahasiswa
+// ViewModel untuk mengatur data dan logika form tambah terapis
 class InsertTerapisViewModel(private val trps: TerapisRepo): ViewModel() {
 
     // Data untuk menyimpan keadaan form (seperti input dari pengguna)
@@ -21,7 +21,7 @@ class InsertTerapisViewModel(private val trps: TerapisRepo): ViewModel() {
         insertTUiState = InsertTUiState(insertTUiEvent = insertTerUiEvent) // Perbarui data berdasarkan event
     }
 
-    // Fungsi untuk menambahkan data mahasiswa ke database
+    // Fungsi untuk menambahkan data terapis ke database
     suspend fun insertTer() {
         viewModelScope.launch { // Menjalankan proses di latar belakang (tidak mengganggu UI)
             try {
@@ -48,21 +48,21 @@ data class InsertTUiEvent(
 )
 
 // Fungsi untuk mengubah data InsertUiEvent menjadi terapis
-fun InsertTUiEvent.toTrps(): Terapis = Terapis( // InsertUiEvent > Mahasiswa > Simpan data Mhs ke db
-    id_terapis = id_terapis, // Memindahkan nilai NIM dari InsertUiEvent ke Mahasiswa
+fun InsertTUiEvent.toTrps(): Terapis = Terapis( // InsertUiEvent > terapis > Simpan data Trps ke db
+    id_terapis = id_terapis, // Memindahkan nilai ID dari InsertUiEvent ke terapis
     nama_terapis = nama_terapis,
     spesialisasi = spesialisasi,
     nomor_izin_praktik = nomor_izin_praktik
 )
 
-// Fungsi untuk mengubah data Mahasiswa menjadi InsertUiState
-fun Terapis.toInsertTUiStateTer(): InsertTUiState = InsertTUiState( // Mahasiswa > insertUiEvent > Masuk ke InsertUiState
-    insertTUiEvent = toInsertTUiEvent() // Memanggil fungsi toInsertUiEvent untuk mengonversi data Mahasiswa
+// Fungsi untuk mengubah data terapis menjadi InsertUiState
+fun Terapis.toInsertTUiStateTer(): InsertTUiState = InsertTUiState( // terapis > insertUiEvent > Masuk ke InsertUiState
+    insertTUiEvent = toInsertTUiEvent() // Memanggil fungsi toInsertUiEvent untuk mengonversi data terapis
 )
 
-// Fungsi untuk mengubah data Mahasiswa menjadi data InsertUiEvent
+// Fungsi untuk mengubah data terapis menjadi data InsertUiEvent
 fun Terapis.toInsertTUiEvent(): InsertTUiEvent = InsertTUiEvent(
-    id_terapis = id_terapis, // Memindahkan nilai NIM dari Mahasiswa ke InsertUiEvent
+    id_terapis = id_terapis, // Memindahkan nilai ID dari terapis ke InsertUiEvent
     nama_terapis = nama_terapis,
     spesialisasi = spesialisasi,
     nomor_izin_praktik = nomor_izin_praktik
