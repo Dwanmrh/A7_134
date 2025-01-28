@@ -2,12 +2,13 @@ package com.dwan.ta_pam.repository
 
 import com.dwan.ta_pam.service.JenisTerapiService
 import com.dwan.ta_pam.service.PasienService
-import com.dwan.ta_pam.service.SesiService
+import com.dwan.ta_pam.service.SesiTerapiService
 import com.dwan.ta_pam.service.TerapisService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
+
 
 interface AppContainer {
     val pasienRepo: PasienRepo
@@ -33,8 +34,8 @@ class DataKlinikContainer : AppContainer {
     private val jenisService: JenisTerapiService by lazy {
         retrofit.create(JenisTerapiService::class.java)
     }
-    private val sesiService: SesiService by lazy {
-        retrofit.create(SesiService::class.java)
+    private val sesiService: SesiTerapiService by lazy {
+        retrofit.create(SesiTerapiService::class.java)
     }
 
 
