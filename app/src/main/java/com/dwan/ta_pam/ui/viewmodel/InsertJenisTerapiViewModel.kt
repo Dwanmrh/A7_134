@@ -6,12 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dwan.ta_pam.model.JenisTerapi
-import com.dwan.ta_pam.model.Terapis
 import com.dwan.ta_pam.repository.JenisTerapiRepo
-import com.dwan.ta_pam.repository.TerapisRepo
 import kotlinx.coroutines.launch
 
-// ViewModel untuk mengatur data dan logika form tambah mahasiswa
+// ViewModel untuk mengatur data dan logika form tambah jenis terapi
 class InsertJenisTerapiViewModel(private val jns: JenisTerapiRepo): ViewModel() {
 
     // Data untuk menyimpan keadaan form (seperti input dari pengguna)
@@ -23,7 +21,7 @@ class InsertJenisTerapiViewModel(private val jns: JenisTerapiRepo): ViewModel() 
         insertJUiState = InsertJUiState(insertJUiEvent = insertJnsUiEvent) // Perbarui data berdasarkan event
     }
 
-    // Fungsi untuk menambahkan data mahasiswa ke database
+    // Fungsi untuk menambahkan data jenis terapi ke database
     suspend fun insertJns() {
         viewModelScope.launch { // Menjalankan proses di latar belakang (tidak mengganggu UI)
             try {
@@ -49,20 +47,20 @@ data class InsertJUiEvent(
 )
 
 // Fungsi untuk mengubah data InsertUiEvent menjadi terapis
-fun InsertJUiEvent.toJns(): JenisTerapi = JenisTerapi( // InsertUiEvent > Mahasiswa > Simpan data Mhs ke db
-    id_jenis_terapi = id_jenis_terapi, // Memindahkan nilai NIM dari InsertUiEvent ke Mahasiswa
+fun InsertJUiEvent.toJns(): JenisTerapi = JenisTerapi( // InsertUiEvent > jenis terapi > Simpan data Jns ke db
+    id_jenis_terapi = id_jenis_terapi, // Memindahkan nilai ID dari InsertUiEvent ke jenis terapi
     nama_jenis_terapi = nama_jenis_terapi,
     deskripsi_terapi = deskripsi_terapi,
 )
 
-// Fungsi untuk mengubah data Mahasiswa menjadi InsertUiState
-fun JenisTerapi.toInsertJUiStateJns(): InsertJUiState = InsertJUiState( // Mahasiswa > insertUiEvent > Masuk ke InsertUiState
-    insertJUiEvent = toInsertJUiEvent() // Memanggil fungsi toInsertUiEvent untuk mengonversi data Mahasiswa
+// Fungsi untuk mengubah data jenis terapi menjadi InsertUiState
+fun JenisTerapi.toInsertJUiStateJns(): InsertJUiState = InsertJUiState( // jenis terapi > insertUiEvent > Masuk ke InsertUiState
+    insertJUiEvent = toInsertJUiEvent() // Memanggil fungsi toInsertUiEvent untuk mengonversi data jenis terapi
 )
 
-// Fungsi untuk mengubah data Mahasiswa menjadi data InsertUiEvent
+// Fungsi untuk mengubah data jenis terapi menjadi data InsertUiEvent
 fun JenisTerapi.toInsertJUiEvent(): InsertJUiEvent = InsertJUiEvent(
-    id_jenis_terapi = id_jenis_terapi, // Memindahkan nilai NIM dari Mahasiswa ke InsertUiEvent
+    id_jenis_terapi = id_jenis_terapi, // Memindahkan nilai ID dari jenis terapi ke InsertUiEvent
     nama_jenis_terapi = nama_jenis_terapi,
     deskripsi_terapi = deskripsi_terapi
 )
